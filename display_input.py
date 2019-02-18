@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numpy import genfromtxt
 
-data = genfromtxt('fpga_in_43.csv', 
+data = genfromtxt('data/fpga_in_20.csv', 
                     delimiter=',', 
-                    skip_header=450, 
+                    skip_header=550, 
                     skip_footer=400,
                     dtype=np.int16)
 minVal = data.min()
