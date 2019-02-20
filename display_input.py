@@ -4,9 +4,13 @@ import numpy as np
 from numpy import genfromtxt
 from matplotlib.widgets import Slider
 
+# TODO: add file selection gui
+
 filename = 'data/fpga_in_20.csv'
 skiph = 1
 skipf = 0
+outfilename = filename.split('.')[0] + '.png'
+#print(outfilename)
 
 data = genfromtxt(filename, 
                     delimiter=',', 
@@ -17,7 +21,7 @@ minVal = data.min()
 maxVal = data.max()
 byte_array = np.round(255.0 * (data - minVal) /
                     (maxVal - minVal - 1.0)).astype(np.uint8)
-#imageio.imsave('data/echos.png', byte_array)
+imageio.imsave(outfilename, byte_array)
 fig, ax = plt.subplots(figsize=(5, 9))
 im = ax.imshow(data)#, cmap='gray')
 plt.title(filename.split('/')[1])
@@ -46,6 +50,7 @@ def update(val):
     maxVal = data.max()
     byte_array = np.round(255.0 * (data - minVal) /
                         (maxVal - minVal - 1.0)).astype(np.uint8)
+    imageio.imsave(outfilename, byte_array)
     im = ax.imshow(data)#, cmap='gray')
     plt.subplots_adjust(bottom=0.25)
 
