@@ -4,7 +4,7 @@ import numpy as np
 from numpy import genfromtxt
 from matplotlib.widgets import Slider
 
-filename = 'data/fpga_in_43.csv'
+filename = 'data/fpga_in_20.csv'
 skiph = 1
 skipf = 0
 
@@ -17,10 +17,12 @@ minVal = data.min()
 maxVal = data.max()
 byte_array = np.round(255.0 * (data - minVal) /
                     (maxVal - minVal - 1.0)).astype(np.uint8)
-imageio.imsave('data/echos.png', byte_array)
-img = imageio.imread('data/echos.png')
+#imageio.imsave('data/echos.png', byte_array)
 fig, ax = plt.subplots(figsize=(5, 9))
-im = ax.imshow(img)#, cmap='gray')
+im = ax.imshow(data)#, cmap='gray')
+plt.title(filename.split('/')[1])
+#plt.pcolor(vmin=minVal, vmax=maxVal)
+#plt.colorbar(im)
 plt.tight_layout()
 
 # Add sliders 
@@ -44,10 +46,8 @@ def update(val):
     maxVal = data.max()
     byte_array = np.round(255.0 * (data - minVal) /
                         (maxVal - minVal - 1.0)).astype(np.uint8)
-    imageio.imsave('data/echos.png', byte_array)
-    img = imageio.imread('data/echos.png')
-    im = ax.imshow(img)#, cmap='gray')
-    #fig.canvas.draw_idle()
+    im = ax.imshow(data)#, cmap='gray')
+    plt.subplots_adjust(bottom=0.25)
 
 
 slstart.on_changed(update)
