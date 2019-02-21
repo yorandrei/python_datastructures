@@ -41,7 +41,7 @@ class Inspector:
         self.file_name_field.pack(side=LEFT, fill='x', expand='yes')
         self.file_name_field.bind("<Return>", self.open_file)
 
-        photo = PhotoImage(file="resources/arrow_icon2_20.png")
+        photo = PhotoImage(file="resources/arrow_icon.png")
         self.browse_button = Label(top_frame, image=photo)
         self.browse_button.image = photo
         self.browse_button.config(image=photo, width="20", height="20")
