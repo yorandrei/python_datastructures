@@ -22,12 +22,21 @@ class Inspector:
         input_file_name = self.file_name_field.get()
         #input_file_name = os.path.basename()
         print(input_file_name)
+        self.content_text.delete(1.0, END)
+        with open(input_file_name) as _file:
+            self.content_text.insert(1.0, _file.read())
 
     def browse(self, event):
         print("Browsing")
-        ftypes = [('CSV Files)', '*.csv'), ('Excel Fiels', '*.xlsx')]
-        dlg = filedialog.Open(self, filetypes=ftypes)
-        fl = dlg.show()
+        ftypes = [('CSV Files)', '*.csv'), 
+                ('Excel Fiels', '*.xlsx'),
+                ('All', '*')]
+        self.file_path = filedialog.askopenfilename(defaultextension='.csv', 
+                                            filetypes=ftypes)
+        if not self.file_path:
+            return
+        self.input_file_name.set(self.file_path)
+
 
     def setup_fileselect(self):
         top_frame = Frame(root)
