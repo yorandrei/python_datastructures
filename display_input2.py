@@ -5,13 +5,13 @@ from numpy import genfromtxt
 from matplotlib.widgets import Slider
 
 # TODO: add file selection gui
-
 class Graph:
 
-    def __init__(self):
-        self.filename = 'data/fpga_in_20.csv'
-        skiph = 1
-        skipf = 0
+    def __init__(self, filename='data/fpga_in_20.csv', 
+                    head=1, tail=0):
+        self.filename = filename 
+        skiph = head 
+        skipf = tail 
         self.outfilename = self.filename.split('.')[0] + '.png'
 
         data = genfromtxt(self.filename, 
@@ -60,7 +60,5 @@ class Graph:
         plt.subplots_adjust(bottom=0.25)
 
 
-
-
 if __name__ == '__main__':
-    graph = Graph()
+    graph = Graph('data/fpga_in_20.csv', 150, 200)
