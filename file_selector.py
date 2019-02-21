@@ -25,17 +25,18 @@ class Inspector:
 # Initially the text field will display the list of files in current directory
 # When user selects the file to read it is previewed in text field instead.
 # When user clicks "display data" the plt displays it
-# TODO: fix run from entry field
-# TODO: Add hot key combo to entry to display loaded file
+# DONE: fix run from entry field
+# DONE: Add hot key combo to entry to display loaded file Ctrl+Return
+# TODO: Add a checkbox for saving out png
+# TODO: add current open file label
+# TODO: Add entry field for skip header / footer
+# TODO: Keep focus on entry or switch focus to display when file is selected
 # DONE: fix display file name
 # DONE: finish open_file check if file is valid 
-# TODO: add current open file label
 # TODO: package gui
 # TODO: add check if packages are installed and install them
 # TODO: Explore if it's better to display inside gui or outside
-# TODO: Add a checkbox for saving out png
 # DONE: Adjust window size
-# TODO: Add entry field for skip header / footer
 
     def display(self, event):
         graph = Graph(self.input_file_name.get(), 10, 100)
@@ -82,7 +83,7 @@ class Inspector:
         self.content_text.delete(1.0, END)
         with open(file_name) as _file:
             self.content_text.insert(1.0, _file.read())
-        #self.display()
+        self.display(event)
         #cwd = os.getcwd()
         #infile = os.listdir()
         #elif
@@ -107,6 +108,7 @@ class Inspector:
         self.browse_button.config(image=photo, width="20", height="20")
         self.browse_button.bind("<Button-1>", self.open)
         self.browse_button.bind("<Return>", self.open)
+        self.browse_button.bind("<Control-Return>", self.display)
         self.browse_button.pack(side=LEFT, anchor='w')
 
         self.open_button = Button(top_frame, text='Display')
