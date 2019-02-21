@@ -7,13 +7,14 @@ import matplotlib.pyplot as plt
 import numpy as np 
 from numpy import genfromtxt
 from matplotlib.widgets import Slider
+from tkinter import messagebox as mb
 
 PROGRAM_NAME = ' File Inspector '
 
 class Inspector:
     def __init__(self, root):
         self.root = root
-        self.root.geometry('350x350')
+        self.root.geometry('750x350')
         self.root.title(PROGRAM_NAME)
         self.init_gui()
 
@@ -24,7 +25,17 @@ class Inspector:
 # Initially the text field will display the list of files in current directory
 # When user selects the file to read it is previewed in text field instead.
 # When user clicks "display data" the plt displays it
+# TODO: fix run from entry field
+# TODO: Add hot key combo to entry to display loaded file
+# DONE: fix display file name
+# DONE: finish open_file check if file is valid 
+# TODO: add current open file label
+# TODO: package gui
+# TODO: add check if packages are installed and install them
 # TODO: Explore if it's better to display inside gui or outside
+# TODO: Add a checkbox for saving out png
+# DONE: Adjust window size
+# TODO: Add entry field for skip header / footer
 
     def display(self, event):
         graph = Graph(self.input_file_name.get(), 10, 100)
@@ -56,12 +67,24 @@ class Inspector:
     def open_file(self, event):
         file_name = self.input_file_name.get()
         if not file_name:
-            # TODO: Change into a pop-up window
-            print("Please specify file name")
+            mb.showerror(title="Missing File Name", 
+                message="Please enter the name of the file you wish to open")
+            return
+
         # Check if file opens
-        cwd = os.getcwd()
-        infile = os.listdir()
-        print(infile)
+        if not os.path.isfile(file_name):
+            mb.showerror(title="Error Opening File", 
+                message="Could not open specified file: '%s'" % file_name)
+            return
+
+        print("File name passed.  Opening")
+        self.input_file_name.set(file_name)
+        self.content_text.delete(1.0, END)
+        with open(file_name) as _file:
+            self.content_text.insert(1.0, _file.read())
+        #self.display()
+        #cwd = os.getcwd()
+        #infile = os.listdir()
         #elif
         #else:
         #    print("File exists")
@@ -70,7 +93,6 @@ class Inspector:
     def setup_fileselect(self):
         top_frame = Frame(root)
         top_frame.pack(anchor='w', fill='x', padx=5, pady=2)
-        #top_frame.pack(anchor='w', fill='x', expand='yes')
 
         Label(top_frame, text='Select Input File').pack(side=LEFT, padx=3, pady=5)
         self.input_file_name = StringVar()
@@ -136,7 +158,7 @@ class Graph:
         imageio.imsave(self.outfilename, byte_array)
         fig, self.ax = plt.subplots(figsize=(5, 9))
         im = self.ax.imshow(data)#, cmap='gray')
-        plt.title(self.filename.split('/')[1])
+        plt.title(self.filename.split('/')[-1])
         plt.tight_layout()
 
         # Add sliders 
@@ -145,7 +167,7 @@ class Graph:
         axstart = plt.axes([0.25, 0.15, 0.65, 0.03], facecolor=axcolor)
         axstop = plt.axes([0.25, 0.1, 0.65, 0.03], facecolor=axcolor)
 
-        self.slstart = Slider(axstart, "Skip Top", skiph, 700, valinit=0, valstep=1)
+        self.slstart = Slider(axstart, "Skip Top", skiph, 900, valinit=0, valstep=1)
         self.slstop = Slider(axstop, "Skip Bottom", skipf, 700, valinit=0, valstep=1)
 
         self.slstart.on_changed(self.update)
