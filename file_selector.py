@@ -44,7 +44,6 @@ class Inspector:
         self.input_file_name.set(cwd)
 
         self.content_text.delete(1.0, END)
-        #self.content_text.insert(1.0, contents)
         for f in contents:
             self.content_text.insert(END, f)
             self.content_text.insert(END, '\n')
