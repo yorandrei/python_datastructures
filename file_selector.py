@@ -59,6 +59,9 @@ class Inspector:
         self.content_text.delete(1.0, END)
         with open(self.file_path) as _file:
             self.content_text.insert(1.0, _file.read())
+        
+        # Update current file name
+        self.cur_file_name.set(self.file_path.split('/')[-1])
 
     def show_contents(self):
         cwd = os.getcwd()
@@ -83,7 +86,7 @@ class Inspector:
                 message="Could not open specified file: '%s'" % file_name)
             return
 
-        print("File name passed.  Opening")
+        self.cur_file_name.set(file_name.split('/')[-1])
         self.input_file_name.set(file_name)
         self.content_text.delete(1.0, END)
         with open(file_name) as _file:
