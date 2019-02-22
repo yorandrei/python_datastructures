@@ -28,9 +28,12 @@ class Inspector:
 # DONE: fix run from entry field
 # DONE: Add hot key combo to entry to display loaded file Ctrl+Return
 # TODO: Starting position in sliders is viewed as zero.  Need to allow reducing it
+# DONE: Also image scale needs to indicate real position, accounting for skipped rows
 # TODO: Add subframes with bazel around entries in options
-# TODO: Add a checkbox for saving out png
-# TODO: add current open file label
+# TODO: Reduce width of skip fields
+# TODO: Add aspect ratio input
+# DONE: Add a checkbox for saving out png
+# DONE: add current open file label
 # DONE: Add entry field for skip header / footer
 # TODO: Keep focus on entry or switch focus to display when file is selected
 # DONE: fix display file name
@@ -113,14 +116,14 @@ class Inspector:
         # Skip header
         Label(frame, text='Header Skip Lines').pack(side=LEFT, padx=3, pady=5)
         self.header_skip = IntVar()
-        self.header_field = Entry(frame, textvariable=self.header_skip)
+        self.header_field = Entry(frame, textvariable=self.header_skip, width=5)
         self.header_field.pack(side=LEFT)
         self.header_skip.set(1)
 
         # Skip footer
         Label(frame, text='Footer Skip Lines').pack(side=LEFT, padx=3, pady=5)
         self.footer_skip = IntVar()
-        self.footer_field = Entry(frame, textvariable=self.footer_skip)
+        self.footer_field = Entry(frame, textvariable=self.footer_skip, width=5)
         self.footer_field.pack(side=LEFT)
         self.footer_skip.set(1)
 
@@ -181,6 +184,7 @@ class Graph:
         skiph = head 
         skipf = tail 
         self.save = save
+        self.ratio = 0.26
         self.outfilename = self.filename.split('.')[0] + '.png'
 
         data = genfromtxt(self.filename, 
@@ -188,6 +192,11 @@ class Graph:
                             skip_header=skiph, 
                             skip_footer=skipf,
                             dtype=np.int16)
+
+        # These numbers will be used for correct scale display
+        top_sample = skiph - 1
+        bottom_sample = top_sample + data.shape[0] - 1
+
         minVal = data.min()
         maxVal = data.max()
         byte_array = np.round(255.0 * (data - minVal) /
@@ -196,7 +205,11 @@ class Graph:
             imageio.imsave(self.outfilename, byte_array)
 
         fig, self.ax = plt.subplots(figsize=(5, 9))
-        im = self.ax.imshow(data)#, cmap='gray')
+        im = self.ax.imshow(data, 
+            aspect=self.ratio, 
+            extent=[0, 128, bottom_sample, top_sample]) 
+            #, cmap='gray')
+            
         plt.title(self.filename.split('/')[-1])
         plt.tight_layout()
 
@@ -222,13 +235,20 @@ class Graph:
                             skip_header=skiph, 
                             skip_footer=skipf,
                             dtype=np.int16)
+        # Scales
+        top_sample = skiph - 1
+        bottom_sample = top_sample + data.shape[0] - 1
+
         minVal = data.min()
         maxVal = data.max()
         byte_array = np.round(255.0 * (data - minVal) /
                             (maxVal - minVal - 1.0)).astype(np.uint8)
         if self.save:
             imageio.imsave(self.outfilename, byte_array)
-        im = self.ax.imshow(data)#, cmap='gray')
+        im = self.ax.imshow(data, 
+            aspect=self.ratio, 
+            extent=[0, 128, bottom_sample, top_sample]) 
+            #, cmap='gray')
         plt.subplots_adjust(bottom=0.25)
 
 
