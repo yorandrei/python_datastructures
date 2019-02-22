@@ -27,9 +27,11 @@ class Inspector:
 # When user clicks "display data" the plt displays it
 # DONE: fix run from entry field
 # DONE: Add hot key combo to entry to display loaded file Ctrl+Return
+# TODO: Starting position in sliders is viewed as zero.  Need to allow reducing it
+# TODO: Add subframes with bazel around entries in options
 # TODO: Add a checkbox for saving out png
 # TODO: add current open file label
-# TODO: Add entry field for skip header / footer
+# DONE: Add entry field for skip header / footer
 # TODO: Keep focus on entry or switch focus to display when file is selected
 # DONE: fix display file name
 # DONE: finish open_file check if file is valid 
@@ -39,7 +41,10 @@ class Inspector:
 # DONE: Adjust window size
 
     def display(self, event):
-        graph = Graph(self.input_file_name.get(), 10, 100)
+        h = self.header_skip.get()
+        f = self.footer_skip.get()
+        s = self.save_output.get()
+        graph = Graph(self.input_file_name.get(), h, f, s)
 
     def open(self, event):
         ftypes = [('CSV Files)', '*.csv'), 
@@ -84,20 +89,45 @@ class Inspector:
         with open(file_name) as _file:
             self.content_text.insert(1.0, _file.read())
         self.display(event)
-        #cwd = os.getcwd()
-        #infile = os.listdir()
-        #elif
-        #else:
-        #    print("File exists")
 
+    # Options display will show currently selected file, save png checkbox 
+    # and header / footer skip fields
+    def setup_options_display(self):
+        frame = Frame(root)
+        frame.pack(anchor='w', fill='x', padx=5, pady=2)
+
+        # Current file
+        Label(frame, text='File Selected').pack(side=LEFT, padx=3, pady=5)
+        self.cur_file_name = StringVar()
+        self.cur_file_field = Entry(frame, textvariable=self.cur_file_name) 
+        self.cur_file_field.pack(side=LEFT)
+
+        # Save output image file
+        self.save_output = BooleanVar()
+        check = Checkbutton(frame, text='Save Output Image')
+        check.pack(side=LEFT, padx=3, pady=5) #varialble=save_output
+
+        # Skip header
+        Label(frame, text='Header Skip Lines').pack(side=LEFT, padx=3, pady=5)
+        self.header_skip = IntVar()
+        self.header_field = Entry(frame, textvariable=self.header_skip)
+        self.header_field.pack(side=LEFT)
+        self.header_skip.set(1)
+
+        # Skip footer
+        Label(frame, text='Footer Skip Lines').pack(side=LEFT, padx=3, pady=5)
+        self.footer_skip = IntVar()
+        self.footer_field = Entry(frame, textvariable=self.footer_skip)
+        self.footer_field.pack(side=LEFT)
+        self.footer_skip.set(1)
 
     def setup_fileselect(self):
         top_frame = Frame(root)
         top_frame.pack(anchor='w', fill='x', padx=5, pady=2)
 
         Label(top_frame, text='Select Input File').pack(side=LEFT, padx=3, pady=5)
-        self.input_file_name = StringVar()
 
+        self.input_file_name = StringVar()
         self.file_name_field = Entry(top_frame, textvariable=self.input_file_name)
         self.file_name_field.pack(side=LEFT, fill='x', expand='yes')
         self.file_name_field.bind("<Return>", self.open_file)
@@ -136,16 +166,18 @@ class Inspector:
 
     def init_gui(self):
         self.setup_fileselect()
+        self.setup_options_display()
         self.setup_text()
 
 
 class Graph:
 
     def __init__(self, filename='data/fpga_in_20.csv', 
-                    head=1, tail=0):
+                    head=1, tail=0, save=0):
         self.filename = filename 
         skiph = head 
         skipf = tail 
+        self.save = save
         self.outfilename = self.filename.split('.')[0] + '.png'
 
         data = genfromtxt(self.filename, 
@@ -157,7 +189,9 @@ class Graph:
         maxVal = data.max()
         byte_array = np.round(255.0 * (data - minVal) /
                             (maxVal - minVal - 1.0)).astype(np.uint8)
-        imageio.imsave(self.outfilename, byte_array)
+        if save:
+            imageio.imsave(self.outfilename, byte_array)
+
         fig, self.ax = plt.subplots(figsize=(5, 9))
         im = self.ax.imshow(data)#, cmap='gray')
         plt.title(self.filename.split('/')[-1])
@@ -189,7 +223,8 @@ class Graph:
         maxVal = data.max()
         byte_array = np.round(255.0 * (data - minVal) /
                             (maxVal - minVal - 1.0)).astype(np.uint8)
-        imageio.imsave(self.outfilename, byte_array)
+        if self.save:
+            imageio.imsave(self.outfilename, byte_array)
         im = self.ax.imshow(data)#, cmap='gray')
         plt.subplots_adjust(bottom=0.25)
 
