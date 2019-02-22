@@ -18,30 +18,23 @@ class Inspector:
         self.root.title(PROGRAM_NAME)
         self.init_gui()
 
+'''
 # The gui displays a file selector, data preview, a display button
 # the echo display field and its controls can go into gui as well
 # at a later stage.
 
 # Initially the text field will display the list of files in current directory
 # When user selects the file to read it is previewed in text field instead.
-# When user clicks "display data" the plt displays it
-# DONE: fix run from entry field
-# DONE: Add hot key combo to entry to display loaded file Ctrl+Return
+# When user clicks "Display" the plt displays it
+'''
 # TODO: Starting position in sliders is viewed as zero.  Need to allow reducing it
-# DONE: Also image scale needs to indicate real position, accounting for skipped rows
-# DONE: Add subframes with bazel around entries in options
-# DONE: Reduce width of skip fields
-# DONE: Add aspect ratio input
-# DONE: Add a checkbox for saving out png
-# DONE: add current open file label
-# DONE: Add entry field for skip header / footer
 # TODO: Keep focus on entry or switch focus to display when file is selected
-# DONE: fix display file name
-# DONE: finish open_file check if file is valid 
 # TODO: package gui
 # TODO: add check if packages are installed and install them
 # TODO: Explore if it's better to display inside gui or outside
-# DONE: Adjust window size
+# TODO: Remove import * and import only what's needed
+# TODO: Refactor Graph class to eliminate duplication
+# TODO: Clean up names for variables to make sure that they make sense
 
     def display(self, event):
         h = self.header_skip.get()
