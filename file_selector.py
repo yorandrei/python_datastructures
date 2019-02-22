@@ -29,9 +29,9 @@ class Inspector:
 # DONE: Add hot key combo to entry to display loaded file Ctrl+Return
 # TODO: Starting position in sliders is viewed as zero.  Need to allow reducing it
 # DONE: Also image scale needs to indicate real position, accounting for skipped rows
-# TODO: Add subframes with bazel around entries in options
-# TODO: Reduce width of skip fields
-# TODO: Add aspect ratio input
+# DONE: Add subframes with bazel around entries in options
+# DONE: Reduce width of skip fields
+# DONE: Add aspect ratio input
 # DONE: Add a checkbox for saving out png
 # DONE: add current open file label
 # DONE: Add entry field for skip header / footer
@@ -99,11 +99,6 @@ class Inspector:
             self.content_text.insert(1.0, _file.read())
         self.display(event)
 
-    def update_aspect_enable(self, event):
-        if self.aspect_ratio_enable.get():
-            print("Enabling aspect ratio")
-        else:
-            print("Disabling aspect ratio")
 
     # Options display will show currently selected file, save png checkbox 
     # and header / footer skip fields
@@ -117,44 +112,44 @@ class Inspector:
         lf1 = LabelFrame(frame, text='File Selected', padx=xpad, pady=ypad)
         lf1.pack(side=LEFT, padx=xpad, pady=ypad)
         self.cur_file_name = StringVar()
-        self.cur_file_field = Entry(lf1, textvariable=self.cur_file_name) 
-        self.cur_file_field.pack(side=LEFT)
+        cur_file_field = Entry(lf1, textvariable=self.cur_file_name) 
+        cur_file_field.pack(side=LEFT)
 
         # Save output image file
         lf4 = LabelFrame(frame, text='Save Output Image', padx=xpad)
         lf4.pack(side=LEFT, padx=xpad)
-        self.save_output = BooleanVar()
-        check = Checkbutton(lf4, textvariable=self.save_output)
+        self.save_output = IntVar()
+        check = Checkbutton(lf4, variable=self.save_output)
         check.pack(side=LEFT, padx=xpad) #varialble=save_output
+        self.save_output.set(0)
 
         # Skip header
         lf2 = LabelFrame(frame, text='Header Skip Lines', padx=xpad, pady=ypad)
         lf2.pack(side=LEFT, padx=xpad, pady=ypad)
         self.header_skip = IntVar()
-        self.header_field = Entry(lf2, textvariable=self.header_skip, width=5)
-        self.header_field.pack(side=LEFT)
+        header_field = Entry(lf2, textvariable=self.header_skip, width=5)
+        header_field.pack(side=LEFT)
         self.header_skip.set(1)
 
         # Skip footer
         lf3 = LabelFrame(frame, text='Footer Skip Lines', padx=xpad, pady=ypad)
         lf3.pack(side=LEFT, padx=xpad, pady=ypad)
         self.footer_skip = IntVar()
-        self.footer_field = Entry(lf3, textvariable=self.footer_skip, width=5)
-        self.footer_field.pack(side=LEFT)
+        footer_field = Entry(lf3, textvariable=self.footer_skip, width=5)
+        footer_field.pack(side=LEFT)
         self.footer_skip.set(1)
 
         # Set aspect ratio 
         lf5 = LabelFrame(frame, text='Set Aspect Ratio', padx=xpad)
         lf5.pack(side=LEFT, padx=xpad)
         self.aspect_ratio_enable = IntVar() 
-        self.check2 = Checkbutton(lf5, variable=self.aspect_ratio_enable)
-        self.check2.pack(side=LEFT, padx=xpad)
+        check2 = Checkbutton(lf5, variable=self.aspect_ratio_enable)
+        check2.pack(side=LEFT, padx=xpad)
         self.aspect_ratio_enable.set(1)
-        self.check2.bind("<Button-1>", self.update_aspect_enable)
 
         self.aspect_ratio_val = DoubleVar()
-        self.asp_ratio = Entry(lf5, textvariable=self.aspect_ratio_val, width=8)
-        self.asp_ratio.pack(side=LEFT)
+        asp_ratio = Entry(lf5, textvariable=self.aspect_ratio_val, width=8)
+        asp_ratio.pack(side=LEFT)
         self.aspect_ratio_val.set(0.26)
 
 
@@ -165,23 +160,23 @@ class Inspector:
         Label(top_frame, text='Select Input File').pack(side=LEFT, padx=3, pady=5)
 
         self.input_file_name = StringVar()
-        self.file_name_field = Entry(top_frame, textvariable=self.input_file_name)
-        self.file_name_field.pack(side=LEFT, fill='x', expand='yes')
-        self.file_name_field.bind("<Return>", self.open_file)
+        file_name_field = Entry(top_frame, textvariable=self.input_file_name)
+        file_name_field.pack(side=LEFT, fill='x', expand='yes')
+        file_name_field.bind("<Return>", self.open_file)
 
         photo = PhotoImage(file="resources/arrow_icon.png")
-        self.browse_button = Label(top_frame, image=photo)
-        self.browse_button.image = photo
-        self.browse_button.config(image=photo, width="20", height="20")
-        self.browse_button.bind("<Button-1>", self.open)
-        self.browse_button.bind("<Return>", self.open)
-        self.browse_button.bind("<Control-Return>", self.display)
-        self.browse_button.pack(side=LEFT, anchor='w')
+        browse_button = Label(top_frame, image=photo)
+        browse_button.image = photo
+        browse_button.config(image=photo, width="20", height="20")
+        browse_button.bind("<Button-1>", self.open)
+        browse_button.bind("<Return>", self.open)
+        browse_button.bind("<Control-Return>", self.display)
+        browse_button.pack(side=LEFT, anchor='w')
 
-        self.open_button = Button(top_frame, text='Display')
-        self.open_button.pack(side=RIGHT, padx=3, pady=5)
-        self.open_button.bind("<Button-1>", self.display)
-        self.open_button.bind("<Return>", self.display)
+        open_button = Button(top_frame, text='Display')
+        open_button.pack(side=RIGHT, padx=3, pady=5)
+        open_button.bind("<Button-1>", self.display)
+        open_button.bind("<Return>", self.display)
 
 
 
@@ -189,15 +184,15 @@ class Inspector:
         self.content_text = Text(root, wrap='none')
         self.content_text.pack(expand='yes', fill='both')
 
-        self.yscroll_bar = Scrollbar(self.content_text)
-        self.content_text.configure(yscrollcommand=self.yscroll_bar.set)
-        self.yscroll_bar.config(command=self.content_text.yview)
-        self.yscroll_bar.pack(side='right', fill='y')
+        yscroll_bar = Scrollbar(self.content_text)
+        self.content_text.configure(yscrollcommand=yscroll_bar.set)
+        yscroll_bar.config(command=self.content_text.yview)
+        yscroll_bar.pack(side='right', fill='y')
 
-        self.xscroll_bar = Scrollbar(self.content_text, orient=HORIZONTAL)
-        self.content_text.configure(xscrollcommand=self.xscroll_bar.set)
-        self.xscroll_bar.config(command=self.content_text.xview)
-        self.xscroll_bar.pack(side='bottom', fill='x')
+        xscroll_bar = Scrollbar(self.content_text, orient=HORIZONTAL)
+        self.content_text.configure(xscrollcommand=xscroll_bar.set)
+        xscroll_bar.config(command=self.content_text.xview)
+        xscroll_bar.pack(side='bottom', fill='x')
 
         self.show_contents()
 
