@@ -47,11 +47,14 @@ class Inspector:
         h = self.header_skip.get()
         f = self.footer_skip.get()
         s = self.save_output.get()
-        graph = Graph(self.input_file_name.get(), h, f, s)
+        ae = self.aspect_ratio_enable.get()
+        ar = self.aspect_ratio_val.get()
+        graph = Graph(self.input_file_name.get(), h, f, s, ae, ar)
 
     def open(self, event):
         ftypes = [('CSV Files)', '*.csv'), 
                 ('Excel Fiels', '*.xlsx'),
+                ('Images', '*.png'),
                 ('All', '*')]
         self.file_path = filedialog.askopenfilename(defaultextension='.csv', 
                                             filetypes=ftypes)
@@ -96,36 +99,64 @@ class Inspector:
             self.content_text.insert(1.0, _file.read())
         self.display(event)
 
+    def update_aspect_enable(self, event):
+        if self.aspect_ratio_enable.get():
+            print("Enabling aspect ratio")
+        else:
+            print("Disabling aspect ratio")
+
     # Options display will show currently selected file, save png checkbox 
     # and header / footer skip fields
     def setup_options_display(self):
         frame = Frame(root)
-        frame.pack(anchor='w', fill='x', padx=5, pady=2)
+        frame.pack(anchor='w', fill='x', padx=5)
+        xpad = 3
+        ypad = 3
 
         # Current file
-        Label(frame, text='File Selected').pack(side=LEFT, padx=3, pady=5)
+        lf1 = LabelFrame(frame, text='File Selected', padx=xpad, pady=ypad)
+        lf1.pack(side=LEFT, padx=xpad, pady=ypad)
         self.cur_file_name = StringVar()
-        self.cur_file_field = Entry(frame, textvariable=self.cur_file_name) 
+        self.cur_file_field = Entry(lf1, textvariable=self.cur_file_name) 
         self.cur_file_field.pack(side=LEFT)
 
         # Save output image file
+        lf4 = LabelFrame(frame, text='Save Output Image', padx=xpad)
+        lf4.pack(side=LEFT, padx=xpad)
         self.save_output = BooleanVar()
-        check = Checkbutton(frame, text='Save Output Image')
-        check.pack(side=LEFT, padx=3, pady=5) #varialble=save_output
+        check = Checkbutton(lf4, textvariable=self.save_output)
+        check.pack(side=LEFT, padx=xpad) #varialble=save_output
 
         # Skip header
-        Label(frame, text='Header Skip Lines').pack(side=LEFT, padx=3, pady=5)
+        lf2 = LabelFrame(frame, text='Header Skip Lines', padx=xpad, pady=ypad)
+        lf2.pack(side=LEFT, padx=xpad, pady=ypad)
         self.header_skip = IntVar()
-        self.header_field = Entry(frame, textvariable=self.header_skip, width=5)
+        self.header_field = Entry(lf2, textvariable=self.header_skip, width=5)
         self.header_field.pack(side=LEFT)
         self.header_skip.set(1)
 
         # Skip footer
-        Label(frame, text='Footer Skip Lines').pack(side=LEFT, padx=3, pady=5)
+        lf3 = LabelFrame(frame, text='Footer Skip Lines', padx=xpad, pady=ypad)
+        lf3.pack(side=LEFT, padx=xpad, pady=ypad)
         self.footer_skip = IntVar()
-        self.footer_field = Entry(frame, textvariable=self.footer_skip, width=5)
+        self.footer_field = Entry(lf3, textvariable=self.footer_skip, width=5)
         self.footer_field.pack(side=LEFT)
         self.footer_skip.set(1)
+
+        # Set aspect ratio 
+        lf5 = LabelFrame(frame, text='Set Aspect Ratio', padx=xpad)
+        lf5.pack(side=LEFT, padx=xpad)
+        self.aspect_ratio_enable = IntVar() 
+        self.check2 = Checkbutton(lf5, variable=self.aspect_ratio_enable)
+        self.check2.pack(side=LEFT, padx=xpad)
+        self.aspect_ratio_enable.set(1)
+        self.check2.bind("<Button-1>", self.update_aspect_enable)
+
+        self.aspect_ratio_val = DoubleVar()
+        self.asp_ratio = Entry(lf5, textvariable=self.aspect_ratio_val, width=8)
+        self.asp_ratio.pack(side=LEFT)
+        self.aspect_ratio_val.set(0.26)
+
 
     def setup_fileselect(self):
         top_frame = Frame(root)
@@ -179,12 +210,13 @@ class Inspector:
 class Graph:
 
     def __init__(self, filename='data/fpga_in_20.csv', 
-                    head=1, tail=0, save=0):
+                    head=1, tail=0, save=0, ar_en=0, ar_val=0.26):
         self.filename = filename 
         skiph = head 
         skipf = tail 
         self.save = save
-        self.ratio = 0.26
+        self.ratio_enable = ar_en
+        self.ratio = ar_val 
         self.outfilename = self.filename.split('.')[0] + '.png'
 
         data = genfromtxt(self.filename, 
@@ -205,10 +237,14 @@ class Graph:
             imageio.imsave(self.outfilename, byte_array)
 
         fig, self.ax = plt.subplots(figsize=(5, 9))
-        im = self.ax.imshow(data, 
-            aspect=self.ratio, 
-            extent=[0, 128, bottom_sample, top_sample]) 
-            #, cmap='gray')
+
+        if self.ratio_enable:
+            im = self.ax.imshow(data, 
+                aspect=self.ratio, 
+                extent=[0, 128, bottom_sample, top_sample]) 
+        else:
+            im = self.ax.imshow(data, 
+                extent=[0, 128, bottom_sample, top_sample]) 
             
         plt.title(self.filename.split('/')[-1])
         plt.tight_layout()
@@ -245,10 +281,16 @@ class Graph:
                             (maxVal - minVal - 1.0)).astype(np.uint8)
         if self.save:
             imageio.imsave(self.outfilename, byte_array)
-        im = self.ax.imshow(data, 
-            aspect=self.ratio, 
-            extent=[0, 128, bottom_sample, top_sample]) 
-            #, cmap='gray')
+#        im = self.ax.imshow(data, 
+#            aspect=self.ratio, 
+#            extent=[0, 128, bottom_sample, top_sample]) 
+        if self.ratio_enable:
+            im = self.ax.imshow(data, 
+                aspect=self.ratio, 
+                extent=[0, 128, bottom_sample, top_sample]) 
+        else:
+            im = self.ax.imshow(data, 
+                extent=[0, 128, bottom_sample, top_sample]) 
         plt.subplots_adjust(bottom=0.25)
 
 
